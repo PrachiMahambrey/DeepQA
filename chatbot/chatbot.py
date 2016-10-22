@@ -527,6 +527,9 @@ class Chatbot:
             return '/gpu:0'
         elif self.args.device is None:  # No specified device (default)
             return None
+        elif self.args.device.startswith('gpu') and len(self.args.device) == 4:
+            print('Attempting to use arbitrary device {}'.format(self.args.device))
+            return '/gpu:' + self.args.device[-1]
         else:
             print('Warning: Error in the device name: {}, use the default device'.format(self.args.device))
             return None
