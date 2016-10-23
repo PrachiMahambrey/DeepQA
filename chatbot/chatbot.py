@@ -98,7 +98,7 @@ class Chatbot:
         globalArgs.add_argument('--modelTag', type=str, default=None, help='tag to differentiate which model to store/load')
         globalArgs.add_argument('--rootDir', type=str, default=None, help='folder where to look for the models and data')
         globalArgs.add_argument('--watsonMode', action='store_true', help='Inverse the questions and answer when training (the network try to guess the question)')
-        globalArgs.add_argument('--device', type=str, default=None, help='\'gpu\' or \'cpu\' (Warning: make sure you have enough free RAM), allow to choose on which hardware run the model')
+        globalArgs.add_argument('--device', type=str, default=None, help='\'gpu\' or \'cpu\' - alternatively specify a gpu eg \'gpu2\' (Warning: make sure you have enough free RAM), allow to choose on which hardware run the model')
         globalArgs.add_argument('--seed', type=int, default=None, help='random seed for replication')
 
         # Dataset options
@@ -166,7 +166,7 @@ class Chatbot:
 
         # Running session
 
-        self.sess = tf.Session()  # TODO: Replace all sess by self.sess (not necessary a good idea) ?
+        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))  # TODO: Replace all sess by self.sess (not necessary a good idea) ?
 
         print('Initialize variables...')
         self.sess.run(tf.initialize_all_variables())
@@ -528,8 +528,9 @@ class Chatbot:
         elif self.args.device is None:  # No specified device (default)
             return None
         elif self.args.device.startswith('gpu') and len(self.args.device) == 4:
-            print('Attempting to use arbitrary device {}'.format(self.args.device))
-            return '/gpu:' + self.args.device[-1]
+            device = '/gpu:' + self.args.device[-1]
+            print('Attempting to use arbitrary device {}'.format(device))
+            return device
         else:
             print('Warning: Error in the device name: {}, use the default device'.format(self.args.device))
             return None
